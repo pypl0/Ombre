@@ -1,0 +1,21 @@
+# Ombre has ZERO required dependencies.
+# Install only what you need based on your AI provider.
+#
+# Install from GitHub:
+#   pip install git+https://github.com/Pypl0/Ombre.git
+#
+# With your provider:
+#   pip install "git+https://github.com/Pypl0/Ombre.git#egg=ombre-ai[openai]"
+#   pip install "git+https://github.com/Pypl0/Ombre.git#egg=ombre-ai[anthropic]"
+#   pip install "git+https://github.com/Pypl0/Ombre.git#egg=ombre-ai[groq]"
+#   pip install "git+https://github.com/Pypl0/Ombre.git#egg=ombre-ai[all-providers]"
+
+# AI Providers — install at least one:
+# openai>=1.0.0
+# anthropic>=0.20.0
+# groq>=0.4.0
+# mistralai>=0.4.0
+
+# Optional storage backends:
+# redis>=5.0.0            — distributed memory
+# psycopg2-binary>=2.9.0  — PostgreSQL memory/audit
