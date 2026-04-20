@@ -3,7 +3,7 @@ Ombre SDK — setup.py
 ====================
 Install via GitHub (no PyPI dependency):
 
-    pip install git+https://github.com/ombre-ai/ombre-core.git
+    pip install git+https://github.com/Pypl0/Ombre.git
 
 Or for a specific version:
 
