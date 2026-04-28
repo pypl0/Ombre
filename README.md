@@ -2,229 +2,212 @@
 
 # Ombre
 
-**The infrastructure layer that makes AI trustworthy.**
+### The AI infrastructure layer that makes every AI system trustworthy, efficient, and accountable.
 
-Every AI system has three unsolved problems: it costs too much, it gets things wrong, and nobody can prove it behaved correctly. Ombre solves all three — running entirely inside your own infrastructure.
+[
 
-[![License: BUSL-1.1](https://img.shields.io/badge/License-BUSL_1.1-blue.svg)](./LICENSE)
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![Zero Dependencies](https://img.shields.io/badge/dependencies-zero-green.svg)]()
+![Version](https://img.shields.io/badge/version-1.1.0-brightgreen)
 
-**Your data never leaves your environment. You bring your own API keys.**
+](https://github.com/pypl0/Ombre/releases)
+[
+
+![License](https://img.shields.io/badge/license-BUSL%201.1-blue)
+
+](LICENSE)
+[
+
+![Listed](https://img.shields.io/badge/awesome--machine--learning-listed-orange)
+
+](https://github.com/josephmisiti/awesome-machine-learning)
+[
+
+![Install](https://img.shields.io/badge/install-one%20line-black)
+
+](https://github.com/pypl0/Ombre)
+
+**Your data never leaves your infrastructure. You bring your own API keys.**
 
 </div>
 
 ---
 
+## The Problem
+
+Every company deploying AI hits the same four walls:
+
+- **It costs too much** — OpenAI bills spike with no warning
+- **It gets things wrong** — hallucinations reach real users
+- **Nobody can prove it behaved correctly** — no audit trail
+- **It gets attacked** — prompt injection is now a documented attack vector
+
+Most teams build workarounds for each problem separately.
+Ombre solves all four simultaneously. Automatically. On every request.
+
+---
+
 ## What Ombre Does
 
-Ombre sits between your application and any AI model. Every request flows through 8 agents automatically:
+One line of code activates 11 autonomous agents on every AI request.
 
-| Agent | What It Does |
-|---|---|
-| **Security** | Blocks prompt injection, redacts PII, stops harmful content |
-| **Memory** | Persistent encrypted context across sessions |
-| **Token** | Semantic cache + compression — 40–60% cost reduction |
-| **Compute** | Routes to the best model and provider automatically |
-| **Truth** | Pre-loads verified facts to reduce hallucinations |
-| **Latency** | P99 monitoring, SLA enforcement, circuit breaking |
-| **Reliability** | Validates output, scores confidence, catches hallucinations |
-| **Audit** | Immutable tamper-proof log of every AI decision |
+\```bash
+pip install git+https://github.com/pypl0/Ombre.git
+\```
 
----
-
-## Install
-
-```bash
-# Base install
-pip install git+https://github.com/ombre-ai/ombre-core.git
-
-# With your provider
-pip install "git+https://github.com/ombre-ai/ombre-core.git#egg=ombre-ai[openai]"
-pip install "git+https://github.com/ombre-ai/ombre-core.git#egg=ombre-ai[anthropic]"
-pip install "git+https://github.com/ombre-ai/ombre-core.git#egg=ombre-ai[groq]"
-pip install "git+https://github.com/ombre-ai/ombre-core.git#egg=ombre-ai[all-providers]"
-```
-
-**Air-gapped / offline environments:**
-```bash
-git clone https://github.com/ombre-ai/ombre-core.git
-pip install ./ombre-core
-```
-
----
-
-## Quick Start
-
-```python
+\```python
 from ombre import Ombre
 
-ai = Ombre(
-    openai_key="sk-...",        # Your key — Ombre never sees it
-    # anthropic_key="sk-ant-...",
-    # groq_key="gsk-...",
-)
-
-response = ai.run("Summarize our Q3 financials and recommend next steps")
+ai = Ombre(openai_key="your-key")
+response = ai.run("Analyze this contract for legal risks")
 
 print(response.text)                  # The answer
-print(response.confidence)            # Verified confidence score (0.0–1.0)
-print(response.cost_saved)            # Dollars saved vs raw API call
-print(response.audit_id)              # Immutable audit reference
-print(response.hallucinations_caught) # Bad answers stopped before reaching you
-print(response.threats_blocked)       # Security events intercepted
-```
+print(response.confidence)            # Verified confidence score
+print(response.cost_saved)            # Real dollars saved
+print(response.audit_id)             # Tamper-proof audit reference
+print(response.threats_blocked)       # Security events caught
+print(response.hallucinations_caught) # Bad answers stopped
+\```
 
 ---
 
-## Multi-turn Chat
+## The 11 Agents
 
-```python
-response = ai.chat([
-    {"role": "user", "content": "My name is Alex. I work in finance."},
-    {"role": "assistant", "content": "Got it Alex, how can I help?"},
-    {"role": "user", "content": "What should I focus on this quarter?"},
-])
-# Memory Agent remembers Alex works in finance — no need to repeat it
-```
+Every request flows through all 11 agents automatically.
+You never manage them. They just work.
 
----
-
-## Batch Processing
-
-```python
-responses = ai.batch([
-    "Summarize contract 1",
-    "Summarize contract 2",
-    "Summarize contract 3",
-], concurrency=5)
-```
+| Agent | What It Does Automatically |
+|---|---|
+| 🔒 **Security** | Blocks prompt injection, redacts PII, stops harmful content |
+| 🧠 **Memory** | Remembers context across sessions — AI that never forgets |
+| 💰 **Token** | Semantic cache serves 40-60% of requests without hitting the API |
+| ⚡ **Compute** | Routes to the best model and cheapest provider automatically |
+| ✅ **Truth** | Pre-loads verified facts before inference — fewer hallucinations |
+| ⏱ **Latency** | P99 monitoring, SLA enforcement, automatic failover |
+| 🎯 **Reliability** | Validates every response, scores confidence, catches hallucinations |
+| 📋 **Audit** | Tamper-proof SHA-256 chain of every AI decision |
+| 🔄 **Feedback** | Learns from outcomes — gets smarter over time |
+| 📊 **Cost** | Real-time spend tracking, budget enforcement, 30-day forecasting |
+| 🏛 **Compliance** | EU AI Act, HIPAA, SOC2, GDPR — automated reporting |
 
 ---
 
-## Add Your Own Ground Truth
+## Works With Every Provider
 
-```python
-# Verified facts — model uses these instead of guessing
-ai.truth.add_fact(
-    key="company_ceo",
-    fact="The CEO of Acme Corp is Jane Smith, appointed January 2022",
-    confidence=1.0,
-    source="company_records",
+\```python
+# Use any provider — or all of them simultaneously
+ai = Ombre(
+    openai_key="sk-...",       # OpenAI
+    anthropic_key="sk-ant-...", # Claude
+    groq_key="gsk-...",         # Groq
+    mistral_key="...",          # Mistral
 )
-```
+# Ombre automatically routes each request to the
+# best available model based on task type and cost
+\```
 
 ---
 
-## Audit Export
+## Three Ways To Integrate
 
-```python
-# Export for compliance
-ai.export_audit("audit.json", format="json")
-ai.export_audit("audit.csv", format="csv")
+**Python SDK — install from GitHub:**
+\```bash
+pip install git+https://github.com/pypl0/Ombre.git
+\```
 
-# EU AI Act compliance report
-ai.audit.generate_compliance_report(
-    regulation="eu_ai_act",
-    output_path="compliance_report.json",
-)
-```
-
----
-
-## Self-Hosted REST API
-
-Run a local server on your own infrastructure. Zero data leaves your environment.
-
-```bash
-# Start the server
-python -m ombre serve --port 8080
-
-# Or from CLI
-ombre serve --port 8080
-```
-
-Call from any language:
-
-```bash
-# cURL
+**Self-hosted REST API — any language:**
+\```python
+ai.serve(port=8080)  # Starts local server
+\```
+\```bash
 curl -X POST http://localhost:8080/v1/run \
-  -H "Content-Type: application/json" \
-  -d '{"prompt": "Your prompt here"}'
-```
+  -d '{"prompt": "your prompt here"}'
+\```
 
-```python
-# Python
-import requests
-r = requests.post("http://localhost:8080/v1/run",
-    json={"prompt": "Your prompt here"})
-print(r.json()["text"])
-```
-
-```javascript
-// JavaScript / Node
-const res = await fetch("http://localhost:8080/v1/run", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ prompt: "Your prompt here" })
-})
-const data = await res.json()
-console.log(data.text)
-```
-
-```go
-// Go
-resp, _ := http.Post("http://localhost:8080/v1/run",
-    "application/json",
-    strings.NewReader(`{"prompt":"Your prompt here"}`))
-```
+**Air-gapped / offline environments:**
+\```bash
+wget https://github.com/pypl0/Ombre/archive/refs/heads/main.tar.gz
+pip install ./main.tar.gz
+\```
 
 ---
 
-## Environment Variables
+## Real Numbers
 
-```bash
-export OPENAI_API_KEY=sk-...
-export ANTHROPIC_API_KEY=sk-ant-...
-export GROQ_API_KEY=gsk-...
-export OMBRE_API_KEY=omb_ent_...   # Enterprise license key (optional)
-```
+| Metric | Result |
+|---|---|
+| API cost reduction | 40-60% on typical workloads |
+| Security patterns | 20+ injection attack vectors blocked |
+| PII categories | 12 data types automatically redacted |
+| Audit integrity | SHA-256 tamper-proof chain |
+| Pipeline overhead | <10ms per request |
+| Compliance frameworks | EU AI Act, HIPAA, SOC2, GDPR |
 
-Then initialize with no arguments:
+---
 
-```python
-ai = Ombre()  # Reads keys from environment automatically
-```
+## Who Uses Ombre
+
+**AI Startups** — Cut your OpenAI bill in half before your next board meeting.
+
+**Enterprise Teams** — The audit trail your legal team has been asking for.
+Finally.
+
+**Healthcare & Legal** — HIPAA-ready, attorney-client privilege preserved.
+Data never leaves your infrastructure.
+
+**Government & Defense** — Air-gapped deployment. Classified data
+stays classified.
+
+---
+
+## Budget Control
+
+\```python
+# Never get surprised by an AI bill again
+ai.set_budget(limit=100.00)  # Block requests after $100 spent
+
+report = ai.get_cost_report()
+print(report["total_spend_usd"])      # What you've spent
+print(report["total_saved_usd"])      # What Ombre saved you
+print(report["forecast_30d"])         # What next month looks like
+\```
+
+---
+
+## Compliance Reports
+
+\```python
+# Generate EU AI Act compliance report in one line
+report = ai.get_compliance_report(
+    framework="eu_ai_act",
+    output_path="compliance_report.json"
+)
+print(report["status"])          # COMPLIANT or NEEDS_ATTENTION
+print(report["compliance_score"]) # 0.0 to 1.0
+\```
+
+Supported frameworks: `eu_ai_act` `hipaa` `soc2` `gdpr`
 
 ---
 
 ## Architecture
 
-```
+\```
 Your Application
-      │
-      ▼
+      ↓
 ┌─────────────────────────────────────┐
 │           OMBRE LAYER               │
 │  (runs inside your infrastructure)  │
 │                                     │
-│  1. Security Agent                  │
-│  2. Memory Agent                    │
-│  3. Token Agent  ◄── cache hit?     │
-│  4. Compute Agent                   │
-│  5. Truth Agent                     │
-│  ── model inference ──              │
-│  6. Latency Agent                   │
-│  7. Reliability Agent               │
-│  8. Audit Agent                     │
+│  Security → Memory → Token          │
+│  Compute → Truth → [Model]          │
+│  Latency → Reliability → Compliance │
+│  Audit → Feedback → Cost            │
 └─────────────────────────────────────┘
-      │
-      ▼
-Your AI Model
-(OpenAI / Anthropic / Groq / Mistral)
-```
+      ↓
+Any AI Model (OpenAI / Anthropic / Groq / Mistral)
+\```
 
-No Ombre server involved. Everything runs locally on your machine.
+No Ombre server involved. Everything runs locally.
+Your prompts and responses never leave your environment.
 
 ---
 
@@ -232,53 +215,26 @@ No Ombre server involved. Everything runs locally on your machine.
 
 | Tier | Price | Who |
 |---|---|---|
-| **Free** | $0 forever | Developers, small startups |
-| **Growth** | $2,500/month | Series A+ startups |
-| **Enterprise** | Custom | Large companies |
-| **Government** | Custom | Agencies, defense contractors |
+| **Free** | $0 forever | Developers, startups |
+| **Growth** | $2,500/month | Series A+ companies |
+| **Enterprise** | Custom | Large organizations |
+| **Government** | Custom | Agencies, defense |
 
-Free tier includes all 8 agents with no time limit. No credit card required.
+Enterprise licenses paid in USDT (TRC20):
+`TT3aCEYKF1d9PpyLDdzKGULi6Maa3DqPVU`
 
----
-
-## Enterprise Licensing & Payment
-
-Enterprise licenses are invoiced annually. Payment accepted in **USDT (TRC20) only**.
-
-> ⚠️ **CRITICAL: Only send USDT on the TRC20 network.**
-> Sending any other token or using ERC20 / BEP20 / any other network
-> will result in **permanent loss of funds.**
-> Ombre cannot recover misdirected payments.
-
-**Network:** TRON (TRC20)  
-**Token:** USDT only  
-**Wallet address:** `TT3aCEYKF1d9PpyLDdzKGULi6Maa3DqPVU`  
-**Memo:** Not required
-
-### Step-by-step payment
-
-1. Open your exchange or crypto wallet
-2. Select **Send / Withdraw**
-3. Select token: **USDT**
-4. Select network: **TRC20** ← this is critical
-5. Paste wallet address exactly: `TT3aCEYKF1d9PpyLDdzKGULi6Maa3DqPVU`
-6. No memo required — leave blank
-7. Send the exact invoice amount
-8. Email the transaction hash to **ombreaiq@gmail.com**
-   - Subject line: `Payment - [Your Company Name]`
-   - Include: company name, license tier, transaction hash
-
-License key delivered within 24 hours of confirmed payment on-chain.
+After payment email: `ombreaiq@gmail.com`
 
 ---
 
 ## Contact
 
 - **Email:** ombreaiq@gmail.com
-- **GitHub:** [github.com/ombre-ai/ombre-core](https://github.com/ombre-ai/ombre-core)
+- **GitHub:** github.com/pypl0/Ombre
 
 ---
 
-## License
+<div align="center">
 
-[Business Source License 1.1](./LICENSE) — Free for internal use. Converts to Apache 2.0 four years from each release date. Commercial hosting restrictions apply. See LICENSE for details.
+**Ombre makes AI trustworthy enough to actually use in production.**
+
