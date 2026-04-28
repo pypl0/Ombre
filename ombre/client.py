@@ -57,7 +57,7 @@ class Ombre:
     Customers bring their own API keys.
     """
 
-    VERSION = "1.0.0"
+    VERSION = "1.1.0"
 
     def __init__(
         self,
@@ -115,8 +115,8 @@ class Ombre:
         self.audit = AuditAgent(self.config)
         self.feedback = FeedbackAgent(self.config)
         self.cost = CostAgent(self.config)
-self.compliance = ComplianceAgent(self.config)
-        logger.debug("All 8 Ombre agents initialized")
+        self.compliance = ComplianceAgent(self.config)
+        logger.debug("All 11 Ombre agents initialized")
 
     def run(
         self,
@@ -168,7 +168,9 @@ self.compliance = ComplianceAgent(self.config)
             ctx = self._run_inference(ctx)
             ctx = self.latency.process(ctx)
             ctx = self.reliability.process(ctx)
+            ctx = self.compliance.process(ctx)
             ctx = self.audit.process(ctx)
+            self.cost.record_spend(ctx)
 
             response = self._build_response(ctx, request_id, pipeline_start)
             self.feedback.process_async(ctx, response)
@@ -300,6 +302,22 @@ self.compliance = ComplianceAgent(self.config)
         logger.info(f"Starting Ombre server on {host}:{port}")
         server.run(host=host, port=port)
 
+    def set_budget(self, limit: float, alert_threshold: float = 0.8) -> None:
+        """Set a spend budget limit. Requests are blocked when limit is reached."""
+        self.cost.set_budget(limit, alert_threshold)
+
+    def get_cost_report(self) -> Dict[str, Any]:
+        """Get current cost breakdown and forecast."""
+        return self.cost.get_breakdown()
+
+    def get_compliance_report(
+        self,
+        framework: str = "eu_ai_act",
+        output_path: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Generate a compliance report for a specific framework."""
+        return self.compliance.generate_report(framework, output_path)
+
     def stats(self) -> Dict[str, Any]:
         uptime = round(time.time() - self._start_time, 2)
         return {
@@ -318,7 +336,7 @@ self.compliance = ComplianceAgent(self.config)
                 "audit": self.audit.stats(),
                 "feedback": self.feedback.stats(),
                 "cost": self.cost.stats(),
-"compliance": self.compliance.stats(),
+                "compliance": self.compliance.stats(),
             },
         }
 
