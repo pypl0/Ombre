@@ -114,6 +114,8 @@ class Ombre:
         self.reliability = ReliabilityAgent(self.config)
         self.audit = AuditAgent(self.config)
         self.feedback = FeedbackAgent(self.config)
+        self.cost = CostAgent(self.config)
+self.compliance = ComplianceAgent(self.config)
         logger.debug("All 8 Ombre agents initialized")
 
     def run(
@@ -315,6 +317,8 @@ class Ombre:
                 "reliability": self.reliability.stats(),
                 "audit": self.audit.stats(),
                 "feedback": self.feedback.stats(),
+                "cost": self.cost.stats(),
+"compliance": self.compliance.stats(),
             },
         }
 
