@@ -39,6 +39,8 @@ from .agents.latency import LatencyAgent
 from .agents.reliability import ReliabilityAgent
 from .agents.audit import AuditAgent
 from .agents.feedback import FeedbackAgent
+from .agents.cost import CostAgent
+from .agents.compliance import ComplianceAgent
 from .utils.logger import get_logger
 from .utils.validators import validate_prompt, validate_config
 from .utils.crypto import generate_request_id
