@@ -1,12 +1,11 @@
 <div align="center">
 
 # Ombre
-
-### The AI infrastructure layer that makes every AI system trustworthy, efficient, and accountable.
+### The AI Security Perimeter
 
 [
 
-![Version](https://img.shields.io/badge/version-1.1.0-brightgreen)
+![Version](https://img.shields.io/badge/version-2.0.0-brightgreen)
 
 ](https://github.com/pypl0/Ombre/releases)
 [
@@ -16,225 +15,199 @@
 ](LICENSE)
 [
 
+![Agents](https://img.shields.io/badge/agents-17-purple)
+
+](https://github.com/pypl0/Ombre)
+[
+
 ![Listed](https://img.shields.io/badge/awesome--machine--learning-listed-orange)
 
 ](https://github.com/josephmisiti/awesome-machine-learning)
 [
 
-![Install](https://img.shields.io/badge/install-one%20line-black)
+![Security](https://img.shields.io/badge/OWASP-Top%2010%20covered-red)
 
 ](https://github.com/pypl0/Ombre)
 
-**Your data never leaves your infrastructure. You bring your own API keys.**
+**17 autonomous agents. One swarm intelligence. Zero data transmission.**
+
+*The open source answer to Project Glasswing.*
 
 </div>
 
 ---
 
-## The Problem
+## Why Ombre Exists
 
-Every company deploying AI hits the same four walls:
+Anthropic's Claude Mythos Preview found thousands of zero-day 
+vulnerabilities across every major OS and browser. They locked 
+it away for 50 companies through Project Glasswing.
 
-- **It costs too much** — OpenAI bills spike with no warning
-- **It gets things wrong** — hallucinations reach real users
-- **Nobody can prove it behaved correctly** — no audit trail
-- **It gets attacked** — prompt injection is now a documented attack vector
-
-Most teams build workarounds for each problem separately.
-Ombre solves all four simultaneously. Automatically. On every request.
+Ombre brings defensive AI security to every developer on earth.
+Free. Open source. No $100M membership required.
 
 ---
 
-## What Ombre Does
+## The Security Perimeter
+Your Application
+↓
+┌─────────────────────────────────────────────────┐
+│              OMBRE SECURITY PERIMETER            │
+│                                                  │
+│  SENTINEL ──── coordinates all 17 agents        │
+│      │                                           │
+│  ┌───▼────┐ ┌────────┐ ┌─────────┐ ┌────────┐  │
+│  │Guardian│ │Firewall│ │  Vault  │ │Contract│  │
+│  │Zero-day│ │Indirect│ │PII Token│ │Behavior│  │
+│  │scanning│ │inject. │ │ization  │ │enforce.│  │
+│  └────────┘ └────────┘ └─────────┘ └────────┘  │
+│                                                  │
+│  ┌────────┐ ┌────────┐ ┌─────────┐ ┌────────┐  │
+│  │Security│ │  Audit │ │Complian.│ │  Cost  │  │
+│  │ZeroTrst│ │SHA-256 │ │EU AI Act│ │Tracking│  │
+│  │+8 more │ │  chain │ │ HIPAA  │ │Forecast│  │
+│  └────────┘ └────────┘ └─────────┘ └────────┘  │
+│                                                  │
+│         SHARED THREAT INTELLIGENCE BUS           │
+└─────────────────────────────────────────────────┘
+↓
+Any AI Model (OpenAI / Anthropic / Groq / Mistral)
 
-One line of code activates 11 autonomous agents on every AI request.
+---
 
-\```bash
+## Install
+
+```bash
 pip install git+https://github.com/pypl0/Ombre.git
-\```
 
-\```python
 from ombre import Ombre
 
 ai = Ombre(openai_key="your-key")
+
+# 17 agents activate automatically on every request
 response = ai.run("Analyze this contract for legal risks")
 
-print(response.text)                  # The answer
-print(response.confidence)            # Verified confidence score
-print(response.cost_saved)            # Real dollars saved
-print(response.audit_id)             # Tamper-proof audit reference
-print(response.threats_blocked)       # Security events caught
-print(response.hallucinations_caught) # Bad answers stopped
-\```
+print(response.text)
+print(response.confidence)        # 0.0-1.0
+print(response.cost_saved)        # Dollars saved
+print(response.audit_id)          # Tamper-proof record
+print(response.threats_blocked)   # Attacks stopped
 
----
+Guardian — Zero-Day Vulnerability Scanner
+The open source answer to Claude Mythos Preview.
+# Scan your AI application code
+report = ai.scan_repository("./your_ai_app")
 
-## The 11 Agents
+print(f"Risk score: {report['risk_score']}/10")
+print(f"Critical: {report['summary']['critical']}")
+print(f"Zero-day candidates: {report['summary']['zero_day_candidates']}")
+print(f"OWASP Top 10: {report['compliance']['owasp_top10_coverage']:.0%}")
 
-Every request flows through all 11 agents automatically.
-You never manage them. They just work.
+# Get notified when critical vulnerabilities are found
+def alert_team(notification):
+    print(f"ALERT: {notification['count']} critical vulns in {notification['file']}")
 
-| Agent | What It Does Automatically |
-|---|---|
-| 🔒 **Security** | Blocks prompt injection, redacts PII, stops harmful content |
-| 🧠 **Memory** | Remembers context across sessions — AI that never forgets |
-| 💰 **Token** | Semantic cache serves 40-60% of requests without hitting the API |
-| ⚡ **Compute** | Routes to the best model and cheapest provider automatically |
-| ✅ **Truth** | Pre-loads verified facts before inference — fewer hallucinations |
-| ⏱ **Latency** | P99 monitoring, SLA enforcement, automatic failover |
-| 🎯 **Reliability** | Validates every response, scores confidence, catches hallucinations |
-| 📋 **Audit** | Tamper-proof SHA-256 chain of every AI decision |
-| 🔄 **Feedback** | Learns from outcomes — gets smarter over time |
-| 📊 **Cost** | Real-time spend tracking, budget enforcement, 30-day forecasting |
-| 🏛 **Compliance** | EU AI Act, HIPAA, SOC2, GDPR — automated reporting |
+ai.guardian.add_notification_callback(alert_team)
 
----
+Privacy Vault — PII Never Enters The Model
+Python
+# PII is tokenized before inference, restored after
+# The model reasons about PERSON_A not John Smith
+# HIPAA and GDPR compliant by architecture
 
-## Works With Every Provider
+response = ai.run("Review the contract for John Smith john@acme.com")
+# Model sees: "Review the contract for PERSON_A EMAIL_A"
+# You see: Normal response with real names restored
 
-\```python
-# Use any provider — or all of them simultaneously
-ai = Ombre(
-    openai_key="sk-...",       # OpenAI
-    anthropic_key="sk-ant-...", # Claude
-    groq_key="gsk-...",         # Groq
-    mistral_key="...",          # Mistral
+
+Behavior Contract — Legal-Grade AI Policy
+Python
+
+from ombre.agents.contract import BehaviorContract
+
+contract = BehaviorContract(
+    forbidden_topics=["competitor_products", "legal_advice"],
+    forbidden_outputs=["I cannot help", "As an AI"],
+    min_confidence=0.8,
+    block_violations=True,
 )
-# Ombre automatically routes each request to the
-# best available model based on task type and cost
-\```
+ai.set_contract(contract)
+# Every response validated. Violations produce cryptographic proof.
 
----
+Zero Trust Gateway — Role-Based AI Access
+# Assign roles to users
+ai.zerotrust.assign_role("user_123", "admin")
+ai.zerotrust.assign_role("user_456", "readonly")
 
-## Three Ways To Integrate
+# Block a user instantly
+ai.zerotrust.block_user("user_789", reason="Policy violation")
 
-**Python SDK — install from GitHub:**
-\```bash
-pip install git+https://github.com/pypl0/Ombre.git
-\```
+# Rate limits enforced automatically per role
 
-**Self-hosted REST API — any language:**
-\```python
-ai.serve(port=8080)  # Starts local server
-\```
-\```bash
-curl -X POST http://localhost:8080/v1/run \
-  -d '{"prompt": "your prompt here"}'
-\```
 
-**Air-gapped / offline environments:**
-\```bash
-wget https://github.com/pypl0/Ombre/archive/refs/heads/main.tar.gz
-pip install ./main.tar.gz
-\```
+Swarm Intelligence
 
----
+# See what the swarm knows
+report = ai.get_intelligence_report()
 
-## Real Numbers
+print(report["sentinel_mode"])      # PASSIVE / ACTIVE / LOCKDOWN
+print(report["threat_intelligence"]) # System-wide threat level
+print(report["recent_signals"])      # What each agent detected
 
-| Metric | Result |
-|---|---|
-| API cost reduction | 40-60% on typical workloads |
-| Security patterns | 20+ injection attack vectors blocked |
-| PII categories | 12 data types automatically redacted |
-| Audit integrity | SHA-256 tamper-proof chain |
-| Pipeline overhead | <10ms per request |
-| Compliance frameworks | EU AI Act, HIPAA, SOC2, GDPR |
-
----
-
-## Who Uses Ombre
-
-**AI Startups** — Cut your OpenAI bill in half before your next board meeting.
-
-**Enterprise Teams** — The audit trail your legal team has been asking for.
-Finally.
-
-**Healthcare & Legal** — HIPAA-ready, attorney-client privilege preserved.
-Data never leaves your infrastructure.
-
-**Government & Defense** — Air-gapped deployment. Classified data
-stays classified.
-
----
-
-## Budget Control
-
-\```python
-# Never get surprised by an AI bill again
-ai.set_budget(limit=100.00)  # Block requests after $100 spent
-
-report = ai.get_cost_report()
-print(report["total_spend_usd"])      # What you've spent
-print(report["total_saved_usd"])      # What Ombre saved you
-print(report["forecast_30d"])         # What next month looks like
-\```
-
----
-
-## Compliance Reports
-
-\```python
-# Generate EU AI Act compliance report in one line
-report = ai.get_compliance_report(
-    framework="eu_ai_act",
-    output_path="compliance_report.json"
-)
-print(report["status"])          # COMPLIANT or NEEDS_ATTENTION
-print(report["compliance_score"]) # 0.0 to 1.0
-\```
-
-Supported frameworks: `eu_ai_act` `hipaa` `soc2` `gdpr`
-
----
-
-## Architecture
-
-\```
-Your Application
-      ↓
-┌─────────────────────────────────────┐
-│           OMBRE LAYER               │
-│  (runs inside your infrastructure)  │
-│                                     │
-│  Security → Memory → Token          │
-│  Compute → Truth → [Model]          │
-│  Latency → Reliability → Compliance │
-│  Audit → Feedback → Cost            │
-└─────────────────────────────────────┘
-      ↓
-Any AI Model (OpenAI / Anthropic / Groq / Mistral)
-\```
-
-No Ombre server involved. Everything runs locally.
-Your prompts and responses never leave your environment.
-
----
-
-## Pricing
-
-| Tier | Price | Who |
-|---|---|---|
-| **Free** | $0 forever | Developers, startups |
-| **Growth** | $2,500/month | Series A+ companies |
-| **Enterprise** | Custom | Large organizations |
-| **Government** | Custom | Agencies, defense |
-
-Enterprise licenses paid in USDT (TRC20):
-`TT3aCEYKF1d9PpyLDdzKGULi6Maa3DqPVU`
-
-After payment email: `ombreaiq@gmail.com`
-
----
-
-## Contact
-
-- **Email:** ombreaiq@gmail.com
-- **GitHub:** github.com/pypl0/Ombre
-
----
-
-<div align="center">
-
-**Ombre makes AI trustworthy enough to actually use in production.**
+The 17 Agents
+Agent
+Purpose
+🛡 Guardian
+Zero-day vulnerability scanning
+🧠 Sentinel
+Swarm intelligence coordinator
+🔥 Firewall
+Indirect injection protection
+🔐 Vault
+PII tokenization — model never sees real data
+📜 Contract
+Legal-grade behavior enforcement
+🚪 Zero Trust
+Role-based access control
+🔒 Security
+Direct injection and threat blocking
+🧠 Memory
+Persistent encrypted context
+💰 Token
+Semantic caching — 40-60% cost reduction
+⚡ Compute
+Intelligent model routing
+✅ Truth
+Ground truth injection
+⏱ Latency
+P99 monitoring and SLA enforcement
+🎯 Reliability
+Hallucination detection
+📋 Audit
+Tamper-proof SHA-256 chain
+🔄 Feedback
+Continuous improvement loop
+📊 Cost
+Spend tracking and forecasting
+🏛 Compliance
+EU AI Act, HIPAA, SOC2, GDPR
+Pricing
+Tier
+Price
+Who
+Free
+$0 forever
+Developers, startups
+Growth
+$2,500/month
+Series A+ companies
+Enterprise
+Custom
+Large organizations
+Government
+Custom
+Agencies, defense
+Enterprise licenses: USDT (TRC20)
+TT3aCEYKF1d9PpyLDdzKGULi6Maa3DqPVU
+Contact: ombreaiq@gmail.com
 
