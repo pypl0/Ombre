@@ -1,24 +1,21 @@
 """
 Ombre Core Client
 =================
-The primary interface for interacting with the Ombre AI infrastructure layer.
-All data stays within the customer's own environment. Ombre never sees
-customer prompts, responses, or API keys.
+The AI security perimeter. 17 autonomous agents.
+One swarm intelligence. Zero data transmission.
+
+Your data never leaves your infrastructure.
+You bring your own API keys.
 
 Usage:
     from ombre import Ombre
 
-    ai = Ombre(
-        openai_key="sk-...",
-        anthropic_key="sk-ant-...",
-        ombre_key="omb_ent_..."  # optional, unlocks enterprise features
-    )
-
+    ai = Ombre(openai_key="sk-...")
     response = ai.run("Your prompt here")
     print(response.text)
     print(response.confidence)
-    print(response.cost_saved)
     print(response.audit_id)
+    print(response.threats_blocked)
 """
 
 from __future__ import annotations
@@ -41,6 +38,13 @@ from .agents.audit import AuditAgent
 from .agents.feedback import FeedbackAgent
 from .agents.cost import CostAgent
 from .agents.compliance import ComplianceAgent
+from .agents.vault import VaultAgent
+from .agents.firewall import AIFirewall
+from .agents.contract import ContractAgent, BehaviorContract
+from .agents.zerotrust import ZeroTrustGateway
+from .agents.sentinel import SentinelAgent
+from .agents.guardian import GuardianAgent
+from .core.intelligence import ThreatIntelligenceBus
 from .utils.logger import get_logger
 from .utils.validators import validate_prompt, validate_config
 from .utils.crypto import generate_request_id
@@ -50,14 +54,14 @@ logger = get_logger(__name__)
 
 class Ombre:
     """
-    Ombre — The infrastructure layer that makes AI trustworthy.
+    Ombre — The AI Security Perimeter.
 
-    Runs entirely within the customer's own environment.
-    No data ever leaves the customer's infrastructure.
-    Customers bring their own API keys.
+    17 autonomous agents forming a unified swarm.
+    Shared threat intelligence across all agents.
+    Runs entirely within your own infrastructure.
     """
 
-    VERSION = "1.1.0"
+    VERSION = "2.0.0"
 
     def __init__(
         self,
@@ -100,11 +104,19 @@ class Ombre:
         self._init_agents()
 
         logger.info(
-            f"Ombre v{self.VERSION} initialized | session={self.session_id} | "
+            f"Ombre v{self.VERSION} initialized | "
+            f"session={self.session_id} | "
+            f"agents=17 | "
             f"providers={self.config.available_providers}"
         )
 
     def _init_agents(self) -> None:
+        """Initialize all 17 agents with shared threat intelligence."""
+
+        # Shared threat intelligence bus — the nervous system
+        self._intel = ThreatIntelligenceBus()
+
+        # Core pipeline agents
         self.security = SecurityAgent(self.config)
         self.memory = MemoryAgent(self.config)
         self.token = TokenAgent(self.config)
@@ -116,7 +128,16 @@ class Ombre:
         self.feedback = FeedbackAgent(self.config)
         self.cost = CostAgent(self.config)
         self.compliance = ComplianceAgent(self.config)
-        logger.debug("All 11 Ombre agents initialized")
+
+        # Security swarm — all share the intelligence bus
+        self.vault = VaultAgent(self.config)
+        self.firewall = AIFirewall(self.config)
+        self.contract = ContractAgent(self.config)
+        self.zerotrust = ZeroTrustGateway(self.config)
+        self.sentinel = SentinelAgent(self.config, self._intel)
+        self.guardian = GuardianAgent(self.config, self._intel)
+
+        logger.debug("Ombre swarm initialized — 17 agents active")
 
     def run(
         self,
@@ -152,25 +173,62 @@ class Ombre:
                 request_id=request_id,
             )
 
+            # === SECURITY SWARM — runs first ===
+
+            # Sentinel sets security posture
+            ctx = self.sentinel.process(ctx)
+            if ctx.blocked:
+                return self._build_blocked_response(ctx, request_id)
+
+            # Zero Trust — verify user access
+            ctx = self.zerotrust.process(ctx)
+            if ctx.blocked:
+                return self._build_blocked_response(ctx, request_id)
+
+            # Vault — tokenize PII before anything sees it
+            ctx = self.vault.process(ctx)
+
+            # Firewall — scan all content for indirect injection
+            ctx = self.firewall.process(ctx)
+
+            # Security — direct injection and threat blocking
             ctx = self.security.process(ctx)
             if ctx.blocked:
                 return self._build_blocked_response(ctx, request_id)
+
+            # Guardian — runtime anomaly detection
+            ctx = self.guardian.process(ctx)
+
+            # === CORE PIPELINE ===
 
             ctx = self.memory.process(ctx)
 
             ctx = self.token.process(ctx)
             if ctx.cache_hit:
+                # Restore vault tokens in cached response
+                ctx = self.vault.restore(ctx)
                 logger.info(f"Cache hit | request={request_id}")
                 return self._build_cached_response(ctx, request_id, pipeline_start)
 
             ctx = self.compute.process(ctx)
             ctx = self.truth.process(ctx)
             ctx = self._run_inference(ctx)
+
+            # Restore vault tokens in response
+            ctx = self.vault.restore(ctx)
+
             ctx = self.latency.process(ctx)
             ctx = self.reliability.process(ctx)
+            ctx = self.contract.process(ctx)
+            if ctx.blocked:
+                return self._build_blocked_response(ctx, request_id)
+
             ctx = self.compliance.process(ctx)
             ctx = self.audit.process(ctx)
             self.cost.record_spend(ctx)
+
+            # Sentinel post-process — learns from swarm
+            ctx = self.sentinel.post_process(ctx)
 
             response = self._build_response(ctx, request_id, pipeline_start)
             self.feedback.process_async(ctx, response)
@@ -180,7 +238,7 @@ class Ombre:
                 f"Pipeline complete | request={request_id} | "
                 f"duration={pipeline_ms}ms | "
                 f"model={ctx.selected_model} | "
-                f"tokens={ctx.tokens_used}"
+                f"threats_blocked={ctx.threats_blocked}"
             )
 
             return response
@@ -256,7 +314,6 @@ class Ombre:
                 results.append(embedding)
             else:
                 results.append(None)
-                logger.warning(f"Embedding blocked by security | request={request_id}")
 
         return {
             "embeddings": results,
@@ -274,7 +331,6 @@ class Ombre:
     ) -> List[OmbreResponse]:
         import concurrent.futures
 
-        logger.info(f"Batch run | count={len(prompts)} | concurrency={concurrency}")
         results = [None] * len(prompts)
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=concurrency) as executor:
@@ -292,9 +348,20 @@ class Ombre:
                 try:
                     results[idx] = future.result()
                 except Exception as e:
-                    results[idx] = self._build_error_response(str(e), generate_request_id())
+                    results[idx] = self._build_error_response(
+                        str(e), generate_request_id()
+                    )
 
         return results
+
+    def scan_code(self, code: str, filename: str = "unknown") -> Dict[str, Any]:
+        """Scan code for AI security vulnerabilities using Guardian."""
+        vulns = self.guardian.scan_code(code, filename)
+        return self.guardian._generate_report(vulns, 1, filename)
+
+    def scan_repository(self, path: str) -> Dict[str, Any]:
+        """Scan entire repository for AI security vulnerabilities."""
+        return self.guardian.scan_repository(path)
 
     def serve(self, host: str = "0.0.0.0", port: int = 8080) -> None:
         from .server import OmbreServer
@@ -303,11 +370,19 @@ class Ombre:
         server.run(host=host, port=port)
 
     def set_budget(self, limit: float, alert_threshold: float = 0.8) -> None:
-        """Set a spend budget limit. Requests are blocked when limit is reached."""
+        """Set AI spend budget limit."""
         self.cost.set_budget(limit, alert_threshold)
 
+    def set_contract(self, contract: BehaviorContract) -> None:
+        """Set AI behavior contract."""
+        self.contract.set_contract(contract)
+
+    def get_intelligence_report(self) -> Dict[str, Any]:
+        """Get full swarm intelligence report from Sentinel."""
+        return self.sentinel.get_intelligence_report()
+
     def get_cost_report(self) -> Dict[str, Any]:
-        """Get current cost breakdown and forecast."""
+        """Get cost breakdown and forecast."""
         return self.cost.get_breakdown()
 
     def get_compliance_report(
@@ -315,7 +390,7 @@ class Ombre:
         framework: str = "eu_ai_act",
         output_path: Optional[str] = None,
     ) -> Dict[str, Any]:
-        """Generate a compliance report for a specific framework."""
+        """Generate compliance report."""
         return self.compliance.generate_report(framework, output_path)
 
     def stats(self) -> Dict[str, Any]:
@@ -325,6 +400,7 @@ class Ombre:
             "session_id": self.session_id,
             "uptime_seconds": uptime,
             "providers": self.config.available_providers,
+            "swarm_intelligence": self._intel.summary(),
             "agents": {
                 "security": self.security.stats(),
                 "memory": self.memory.stats(),
@@ -337,13 +413,18 @@ class Ombre:
                 "feedback": self.feedback.stats(),
                 "cost": self.cost.stats(),
                 "compliance": self.compliance.stats(),
+                "vault": self.vault.stats(),
+                "firewall": self.firewall.stats(),
+                "contract": self.contract.stats(),
+                "zerotrust": self.zerotrust.stats(),
+                "sentinel": self.sentinel.stats(),
+                "guardian": self.guardian.stats(),
             },
         }
 
     def reset_memory(self, session_id: Optional[str] = None) -> None:
         target = session_id or self.session_id
         self.memory.clear(target)
-        logger.info(f"Memory cleared | session={target}")
 
     def export_audit(
         self,
@@ -359,7 +440,7 @@ class Ombre:
             end_time=end_time,
         )
 
-    def _build_context(self, prompt: str, **kwargs) -> "PipelineContext":
+    def _build_context(self, prompt: str, **kwargs):
         from .pipeline import PipelineContext
         validate_prompt(prompt)
         return PipelineContext(
@@ -368,7 +449,7 @@ class Ombre:
             **kwargs,
         )
 
-    def _run_inference(self, ctx: "PipelineContext") -> "PipelineContext":
+    def _run_inference(self, ctx):
         return self.compute.infer(ctx)
 
     def _build_response(self, ctx, request_id, pipeline_start) -> OmbreResponse:
@@ -413,7 +494,7 @@ class Ombre:
 
     def _build_blocked_response(self, ctx, request_id) -> OmbreResponse:
         return OmbreResponse(
-            text="[Request blocked by Ombre Security Agent]",
+            text="[Request blocked by Ombre Security Swarm]",
             confidence=0.0,
             cost_saved=0.0,
             audit_id=ctx.audit_id or generate_request_id(),
@@ -456,6 +537,7 @@ class Ombre:
         return (
             f"Ombre(version={self.VERSION}, "
             f"session={self.session_id[:8]}..., "
+            f"agents=17, "
             f"providers={self.config.available_providers})"
         )
 
