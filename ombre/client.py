@@ -44,7 +44,7 @@ from .agents.contract import ContractAgent, BehaviorContract
 from .agents.zerotrust import ZeroTrustGateway
 from .agents.sentinel import SentinelAgent
 from .agents.guardian import GuardianAgent
-from .core.intelligence import ThreatIntelligenceBus
+from .core import ThreatIntelligenceBus
 from .utils.logger import get_logger
 from .utils.validators import validate_prompt, validate_config
 from .utils.crypto import generate_request_id
