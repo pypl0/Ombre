@@ -18,7 +18,7 @@ from __future__ import annotations
 import time
 from typing import Any, Dict, List, Optional
 
-from ..core.intelligence import ThreatIntelligenceBus, ThreatSignal
+from ..core import ThreatIntelligenceBus, ThreatSignal
 from ..utils.logger import get_logger
 
 logger = get_logger(__name__)
