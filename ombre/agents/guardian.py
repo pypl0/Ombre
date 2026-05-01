@@ -29,7 +29,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from ..core.intelligence import ThreatIntelligenceBus, ThreatSignal
+from ..core import ThreatIntelligenceBus, ThreatSignal
 from ..utils.logger import get_logger
 
 logger = get_logger(__name__)
